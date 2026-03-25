@@ -1,4 +1,4 @@
-use crate::spec::{Cc, LinkerFlavor, Lld, TargetOptions, base, cvs};
+use crate::spec::{Cc, LinkerFlavor, Lld, TargetOptions, base, add_link_args};
 
 pub(crate) fn opts() -> TargetOptions {
     // RunixOS is a Linux-kernel-based OS with its own userland and filesystem hierarchy.
@@ -11,9 +11,8 @@ pub(crate) fn opts() -> TargetOptions {
     };
 
     // RunixOS uses LLVM's libunwind instead of libgcc_s.
-    // Add -lunwind to default link args so Rust programs link correctly.
-    base.add_post_link_args(LinkerFlavor::Gnu(Cc::Yes, Lld::No), &["-lunwind"]);
-    base.add_post_link_args(LinkerFlavor::Gnu(Cc::Yes, Lld::Yes), &["-lunwind"]);
+    // add_link_args with Lld::No auto-adds to Lld::Yes too.
+    add_link_args(&mut base.post_link_args, LinkerFlavor::Gnu(Cc::Yes, Lld::No), &["-lunwind"]);
 
     // Default to using lld as the linker
     base.linker_flavor = LinkerFlavor::Gnu(Cc::Yes, Lld::Yes);
