@@ -5,7 +5,7 @@ pub(crate) fn opts() -> TargetOptions {
     // Inherit Linux base config but override OS identity.
     let mut base = TargetOptions {
         os: "runixos".into(),
-        env: "".into(),
+        env: "gnu".into(),
         vendor: std::borrow::Cow::Borrowed("rovelstars"),
         ..base::linux::opts()
     };

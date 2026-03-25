@@ -92,7 +92,7 @@ pub mod unix;
         all(target_vendor = "fortanix", target_env = "sgx")
     )
 )))]
-#[cfg(any(target_os = "linux", doc))]
+#[cfg(any(target_os = "linux", target_os = "runixos", doc))]
 pub mod linux;
 
 // runixos
@@ -205,5 +205,5 @@ pub mod xous;
 ))]
 pub mod fd;
 
-#[cfg(any(target_os = "linux", target_os = "android", target_os = "cygwin", doc))]
+#[cfg(any(target_os = "linux", target_os = "runixos", target_os = "android", target_os = "cygwin", doc))]
 mod net;

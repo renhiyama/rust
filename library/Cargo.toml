@@ -59,3 +59,5 @@ rustflags = ["-Cpanic=abort"]
 rustc-std-workspace-core = { path = 'rustc-std-workspace-core' }
 rustc-std-workspace-alloc = { path = 'rustc-std-workspace-alloc' }
 rustc-std-workspace-std = { path = 'rustc-std-workspace-std' }
+# RunixOS: use our forked libc with RunixOS target support
+libc = { path = '/home/ren/coding/rovelos/libc' }
