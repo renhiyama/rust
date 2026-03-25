@@ -94,3 +94,7 @@ debug = 0
 [profile.dev.package]
 # Only use debuginfo=1 to further reduce compile times.
 bootstrap.debug = 1
+
+[patch.crates-io]
+cc = { path = "/home/ren/coding/rovelos/cc-rs" }
+libc = { path = "/home/ren/coding/rovelos/libc" }
