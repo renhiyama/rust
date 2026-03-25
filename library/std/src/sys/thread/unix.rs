@@ -9,7 +9,7 @@
 use crate::ffi::CStr;
 use crate::mem::{self, ManuallyDrop};
 use crate::num::NonZero;
-#[cfg(all(target_os = "linux", target_env = "gnu"))]
+#[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
 use crate::sys::weak::dlsym;
 #[cfg(any(target_os = "solaris", target_os = "illumos", target_os = "nto",))]
 use crate::sys::weak::weak;
@@ -158,7 +158,7 @@ pub fn available_parallelism() -> io::Result<NonZero<usize>> {
             target_os = "emscripten",
             target_os = "fuchsia",
             target_os = "hurd",
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_os = "aix",
             target_vendor = "apple",
             target_os = "cygwin",
@@ -167,7 +167,7 @@ pub fn available_parallelism() -> io::Result<NonZero<usize>> {
             #[allow(unused_mut)]
             let mut quota = usize::MAX;
 
-            #[cfg(any(target_os = "android", target_os = "linux"))]
+            #[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos")))]
             {
                 quota = cgroups::quota().max(1);
                 let mut set: libc::cpu_set_t = unsafe { mem::zeroed() };
@@ -336,7 +336,7 @@ pub fn current_os_id() -> Option<u64> {
     // for process inspection (debuggers, trace, `top`, etc.).
     cfg_select! {
         // Most platforms have a function returning a `pid_t` or int, which is an `i32`.
-        any(target_os = "android", target_os = "linux") => {
+        any(target_os = "android", any(target_os = "linux", target_os = "runixos")) => {
             use crate::sys::pal::weak::syscall;
 
             // `libc::gettid` is only available on glibc 2.30+, but the syscall is available
@@ -390,7 +390,7 @@ pub fn current_os_id() -> Option<u64> {
 }
 
 #[cfg(any(
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "nto",
     target_os = "solaris",
     target_os = "illumos",
@@ -423,7 +423,7 @@ pub fn set_name(name: &CStr) {
 }
 
 #[cfg(any(
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "freebsd",
     target_os = "dragonfly",
     target_os = "nuttx",
@@ -432,7 +432,7 @@ pub fn set_name(name: &CStr) {
 pub fn set_name(name: &CStr) {
     unsafe {
         cfg_select! {
-            any(target_os = "linux", target_os = "cygwin") => {
+            any(any(target_os = "linux", target_os = "runixos"), target_os = "cygwin") => {
                 // Linux and Cygwin limits the allowed length of the name.
                 const TASK_COMM_LEN: usize = 16;
                 let name = truncate_cstr::<{ TASK_COMM_LEN }>(name);
@@ -588,7 +588,7 @@ pub fn sleep(dur: Duration) {
 #[cfg(any(
     target_os = "freebsd",
     target_os = "netbsd",
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "android",
     target_os = "solaris",
     target_os = "illumos",
@@ -640,7 +640,7 @@ pub fn yield_now() {
     debug_assert_eq!(ret, 0);
 }
 
-#[cfg(any(target_os = "android", target_os = "linux"))]
+#[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos")))]
 mod cgroups {
     //! Currently not covered
     //! * cgroup v2 in non-standard mountpoints
@@ -866,7 +866,7 @@ mod cgroups {
 // We need that information to avoid blowing up when a small stack
 // is created in an application with big thread-local storage requirements.
 // See #6233 for rationale and details.
-#[cfg(all(target_os = "linux", target_env = "gnu"))]
+#[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
 unsafe fn min_stack_size(attr: *const libc::pthread_attr_t) -> usize {
     // We use dlsym to avoid an ELF version dependency on GLIBC_PRIVATE. (#23628)
     // We shouldn't really be using such an internal symbol, but there's currently
@@ -883,7 +883,7 @@ unsafe fn min_stack_size(attr: *const libc::pthread_attr_t) -> usize {
 
 // No point in looking up __pthread_get_minstack() on non-glibc platforms.
 #[cfg(all(
-    not(all(target_os = "linux", target_env = "gnu")),
+    not(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu")),
     not(any(target_os = "netbsd", target_os = "nuttx"))
 ))]
 unsafe fn min_stack_size(_: *const libc::pthread_attr_t) -> usize {

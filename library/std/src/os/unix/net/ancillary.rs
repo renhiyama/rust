@@ -13,7 +13,7 @@ use crate::sys::net::Socket;
 // FIXME(#43348): Make libc adapt #[doc(cfg(...))] so we don't need these fake definitions here?
 #[cfg(all(
     doc,
-    not(target_os = "linux"),
+    not(any(target_os = "linux", target_os = "runixos")),
     not(target_os = "android"),
     not(target_os = "netbsd"),
     not(target_os = "freebsd"),
@@ -194,7 +194,7 @@ impl<'a, T> Iterator for AncillaryDataIter<'a, T> {
 #[cfg(all(
     doc,
     not(target_os = "android"),
-    not(target_os = "linux"),
+    not(any(target_os = "linux", target_os = "runixos")),
     not(target_os = "netbsd"),
     not(target_os = "freebsd"),
     not(target_os = "cygwin"),
@@ -204,7 +204,7 @@ impl<'a, T> Iterator for AncillaryDataIter<'a, T> {
 pub struct SocketCred(());
 
 /// Unix credential.
-#[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
+#[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
 #[unstable(feature = "unix_socket_ancillary_data", issue = "76915")]
 #[derive(Clone)]
 pub struct SocketCred(libc::ucred);
@@ -219,8 +219,8 @@ pub struct SocketCred(libc::sockcred);
 #[derive(Clone)]
 pub struct SocketCred(libc::sockcred2);
 
-#[doc(cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin")))]
-#[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
+#[doc(cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin")))]
+#[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
 impl SocketCred {
     /// Creates a Unix credential struct.
     ///
@@ -407,7 +407,7 @@ impl<'a> Iterator for ScmRights<'a> {
 #[cfg(all(
     doc,
     not(target_os = "android"),
-    not(target_os = "linux"),
+    not(any(target_os = "linux", target_os = "runixos")),
     not(target_os = "netbsd"),
     not(target_os = "freebsd"),
     not(target_os = "cygwin"),
@@ -418,7 +418,7 @@ pub struct ScmCredentials<'a>(AncillaryDataIter<'a, ()>);
 /// This control message contains unix credentials.
 ///
 /// The level is equal to `SOL_SOCKET` and the type is equal to `SCM_CREDENTIALS` or `SCM_CREDS`.
-#[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
+#[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
 #[unstable(feature = "unix_socket_ancillary_data", issue = "76915")]
 pub struct ScmCredentials<'a>(AncillaryDataIter<'a, libc::ucred>);
 
@@ -433,7 +433,7 @@ pub struct ScmCredentials<'a>(AncillaryDataIter<'a, libc::sockcred>);
 #[cfg(any(
     doc,
     target_os = "android",
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "netbsd",
     target_os = "freebsd",
     target_os = "cygwin",
@@ -462,7 +462,7 @@ pub enum AncillaryData<'a> {
     #[cfg(any(
         doc,
         target_os = "android",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "netbsd",
         target_os = "freebsd",
         target_os = "cygwin",
@@ -492,7 +492,7 @@ impl<'a> AncillaryData<'a> {
     #[cfg(any(
         doc,
         target_os = "android",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "netbsd",
         target_os = "freebsd",
         target_os = "cygwin",
@@ -513,7 +513,7 @@ impl<'a> AncillaryData<'a> {
             match (*cmsg).cmsg_level {
                 libc::SOL_SOCKET => match (*cmsg).cmsg_type {
                     libc::SCM_RIGHTS => Ok(AncillaryData::as_rights(data)),
-                    #[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
+                    #[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
                     libc::SCM_CREDENTIALS => Ok(AncillaryData::as_credentials(data)),
                     #[cfg(target_os = "freebsd")]
                     libc::SCM_CREDS2 => Ok(AncillaryData::as_credentials(data)),
@@ -733,7 +733,7 @@ impl<'a> SocketAncillary<'a> {
     #[cfg(any(
         doc,
         target_os = "android",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "netbsd",
         target_os = "freebsd",
         target_os = "cygwin",

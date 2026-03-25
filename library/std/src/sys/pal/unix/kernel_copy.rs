@@ -42,9 +42,9 @@
 //!   progress, they can hit a performance cliff.
 //! * complexity
 
-#[cfg(not(any(all(target_os = "linux", target_env = "gnu"), target_os = "hurd")))]
+#[cfg(not(any(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"), target_os = "hurd")))]
 use libc::sendfile as sendfile64;
-#[cfg(any(all(target_os = "linux", target_env = "gnu"), target_os = "hurd"))]
+#[cfg(any(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"), target_os = "hurd"))]
 use libc::sendfile64;
 use libc::{EBADF, EINVAL, ENOSYS, EOPNOTSUPP, EOVERFLOW, EPERM, EXDEV};
 
@@ -738,7 +738,7 @@ fn sendfile_splice(mode: SpliceMode, reader: RawFd, writer: RawFd, len: u64) -> 
         ) -> libc::ssize_t;
     );
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "runixos"))]
     use libc::splice;
 
     match mode {

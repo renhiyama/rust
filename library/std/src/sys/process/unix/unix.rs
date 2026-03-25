@@ -15,7 +15,7 @@ use crate::io::{self, Error, ErrorKind};
 use crate::num::NonZero;
 use crate::process::StdioPipes;
 use crate::sys::cvt;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "runixos"))]
 use crate::sys::pal::linux::pidfd::PidFd;
 use crate::{fmt, mem, sys};
 
@@ -74,10 +74,10 @@ impl Command {
             return Ok((ret, ours));
         }
 
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "runixos"))]
         let (input, output) = sys::net::Socket::new_pair(libc::AF_UNIX, libc::SOCK_SEQPACKET)?;
 
-        #[cfg(not(target_os = "linux"))]
+        #[cfg(not(any(target_os = "linux", target_os = "runixos")))]
         let (input, output) = sys::pipe::anon_pipe()?;
 
         // Whatever happens after the fork is almost for sure going to touch or
@@ -97,7 +97,7 @@ impl Command {
             crate::panic::always_abort();
             mem::forget(env_lock); // avoid non-async-signal-safe unlocking
             drop(input);
-            #[cfg(target_os = "linux")]
+            #[cfg(any(target_os = "linux", target_os = "runixos"))]
             if self.get_create_pidfd() {
                 self.send_pidfd(&output);
             }
@@ -124,10 +124,10 @@ impl Command {
         drop(env_lock);
         drop(output);
 
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "runixos"))]
         let pidfd = if self.get_create_pidfd() { self.recv_pidfd(&input) } else { -1 };
 
-        #[cfg(not(target_os = "linux"))]
+        #[cfg(not(any(target_os = "linux", target_os = "runixos")))]
         let pidfd = -1;
 
         // Safety: We obtained the pidfd (on Linux) using SOCK_SEQPACKET, so it's valid.
@@ -421,8 +421,8 @@ impl Command {
     #[cfg(not(any(
         target_os = "freebsd",
         target_os = "illumos",
-        all(target_os = "linux", target_env = "gnu"),
-        all(target_os = "linux", target_env = "musl"),
+        all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"),
+        all(any(target_os = "linux", target_os = "runixos"), target_env = "musl"),
         target_os = "nto",
         target_vendor = "apple",
         target_os = "cygwin",
@@ -440,8 +440,8 @@ impl Command {
     #[cfg(any(
         target_os = "freebsd",
         target_os = "illumos",
-        all(target_os = "linux", target_env = "gnu"),
-        all(target_os = "linux", target_env = "musl"),
+        all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"),
+        all(any(target_os = "linux", target_os = "runixos"), target_env = "musl"),
         target_os = "nto",
         target_vendor = "apple",
         target_os = "cygwin",
@@ -451,7 +451,7 @@ impl Command {
         stdio: &ChildPipes,
         envp: Option<&CStringArray>,
     ) -> io::Result<Option<Process>> {
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "runixos"))]
         use core::sync::atomic::{Atomic, AtomicU8, Ordering};
 
         use crate::mem::MaybeUninit;
@@ -468,7 +468,7 @@ impl Command {
         }
 
         cfg_select! {
-            target_os = "linux" => {
+            any(target_os = "linux", target_os = "runixos") => {
                 use crate::sys::weak::weak;
 
                 weak!(
@@ -537,7 +537,7 @@ impl Command {
         }
 
         // Only glibc 2.24+ posix_spawn() supports returning ENOENT directly.
-        #[cfg(all(target_os = "linux", target_env = "gnu"))]
+        #[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
         {
             if let Some(version) = sys::os::glibc_version() {
                 if version < (2, 24) {
@@ -598,7 +598,7 @@ impl Command {
         /// Some platforms can set a new working directory for a spawned process in the
         /// `posix_spawn` path. This function looks up the function pointer for adding
         /// such an action to a `posix_spawn_file_actions_t` struct.
-        #[cfg(not(any(all(target_os = "linux", target_env = "musl"), target_os = "cygwin")))]
+        #[cfg(not(any(all(any(target_os = "linux", target_os = "runixos"), target_env = "musl"), target_os = "cygwin")))]
         fn get_posix_spawn_addchdir() -> Option<PosixSpawnAddChdirFn> {
             use crate::sys::weak::weak;
 
@@ -634,7 +634,7 @@ impl Command {
         /// of the symbol at compile time or know about it upfront.
         ///
         /// Cygwin doesn't support weak symbol, so just link it.
-        #[cfg(any(all(target_os = "linux", target_env = "musl"), target_os = "cygwin"))]
+        #[cfg(any(all(any(target_os = "linux", target_os = "runixos"), target_env = "musl"), target_os = "cygwin"))]
         fn get_posix_spawn_addchdir() -> Option<PosixSpawnAddChdirFn> {
             // Our minimum required musl supports this function, so we can just use it.
             Some(libc::posix_spawn_file_actions_addchdir_np)
@@ -750,7 +750,7 @@ impl Command {
 
             if self.get_setsid() {
                 cfg_select! {
-                    all(target_os = "linux", target_env = "gnu") => {
+                    all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu") => {
                         flags |= libc::POSIX_SPAWN_SETSID;
                     }
                     _ => {
@@ -770,7 +770,7 @@ impl Command {
             #[cfg(target_os = "nto")]
             let spawn_fn = retrying_libc_posix_spawnp;
 
-            #[cfg(target_os = "linux")]
+            #[cfg(any(target_os = "linux", target_os = "runixos"))]
             if self.get_create_pidfd() && PIDFD_SUPPORTED.load(Ordering::Relaxed) == SPAWN {
                 let mut pidfd: libc::c_int = -1;
                 let spawn_res = pidfd_spawnp.get().unwrap()(
@@ -828,7 +828,7 @@ impl Command {
         }
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "runixos"))]
     fn send_pidfd(&self, sock: &crate::sys::net::Socket) {
         use libc::{CMSG_DATA, CMSG_FIRSTHDR, CMSG_LEN, CMSG_SPACE, SCM_RIGHTS, SOL_SOCKET};
 
@@ -886,7 +886,7 @@ impl Command {
         }
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "runixos"))]
     fn recv_pidfd(&self, sock: &crate::sys::net::Socket) -> pid_t {
         use libc::{CMSG_DATA, CMSG_FIRSTHDR, CMSG_LEN, CMSG_SPACE, SCM_RIGHTS, SOL_SOCKET};
 
@@ -952,12 +952,12 @@ pub struct Process {
     // This is None if the user did not request pidfd creation,
     // or if the pidfd could not be created for some reason
     // (e.g. the `pidfd_open` syscall was not available).
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "runixos"))]
     pidfd: Option<PidFd>,
 }
 
 impl Process {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "runixos"))]
     /// # Safety
     ///
     /// `pidfd` must either be -1 (representing no file descriptor) or a valid, exclusively owned file
@@ -972,7 +972,7 @@ impl Process {
         Process { pid, status: None, pidfd }
     }
 
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "runixos")))]
     unsafe fn new(pid: pid_t, _pidfd: pid_t) -> Self {
         Process { pid, status: None }
     }
@@ -992,7 +992,7 @@ impl Process {
         if self.status.is_some() {
             return Ok(());
         }
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "runixos"))]
         if let Some(pid_fd) = self.pidfd.as_ref() {
             // pidfd_send_signal predates pidfd_open. so if we were able to get an fd then sending signals will work too
             return pid_fd.send_signal(signal);
@@ -1005,7 +1005,7 @@ impl Process {
         if let Some(status) = self.status {
             return Ok(status);
         }
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "runixos"))]
         if let Some(pid_fd) = self.pidfd.as_ref() {
             let status = pid_fd.wait()?;
             self.status = Some(status);
@@ -1021,7 +1021,7 @@ impl Process {
         if let Some(status) = self.status {
             return Ok(Some(status));
         }
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "runixos"))]
         if let Some(pid_fd) = self.pidfd.as_ref() {
             let status = pid_fd.try_wait()?;
             if let Some(status) = status {
@@ -1058,7 +1058,7 @@ impl ExitStatus {
         ExitStatus(status)
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "runixos"))]
     pub fn from_waitid_siginfo(siginfo: libc::siginfo_t) -> ExitStatus {
         let status = unsafe { siginfo.si_status() };
 
@@ -1178,7 +1178,7 @@ fn signal_string(signal: i32) -> &'static str {
         libc::SIGSYS => " (SIGSYS)",
         // For information on Linux signals, run `man 7 signal`
         #[cfg(all(
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             any(
                 target_arch = "x86_64",
                 target_arch = "x86",
@@ -1187,7 +1187,7 @@ fn signal_string(signal: i32) -> &'static str {
             )
         ))]
         libc::SIGSTKFLT => " (SIGSTKFLT)",
-        #[cfg(any(target_os = "linux", target_os = "nto", target_os = "cygwin"))]
+        #[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "nto", target_os = "cygwin"))]
         libc::SIGPWR => " (SIGPWR)",
         #[cfg(any(
             target_os = "freebsd",
@@ -1260,7 +1260,7 @@ impl ExitStatusError {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "runixos"))]
 mod linux_child_ext {
     use crate::io::ErrorKind;
     use crate::os::linux::process as os;
@@ -1293,6 +1293,6 @@ mod linux_child_ext {
 mod tests;
 
 // See [`unsupported_wait_status::compare_with_linux`];
-#[cfg(all(test, target_os = "linux"))]
+#[cfg(all(test, any(target_os = "linux", target_os = "runixos")))]
 #[path = "unsupported/wait_status.rs"]
 mod unsupported_wait_status;

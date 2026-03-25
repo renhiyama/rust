@@ -82,7 +82,7 @@ impl UnixListener {
             const backlog: core::ffi::c_int = 128;
             #[cfg(any(
                 // Silently capped to `/proc/sys/net/core/somaxconn`.
-                target_os = "linux",
+                any(target_os = "linux", target_os = "runixos"),
                 // Silently capped to `kern.ipc.soacceptqueue`.
                 target_os = "freebsd",
                 // Silently capped to `kern.somaxconn sysctl`.
@@ -96,7 +96,7 @@ impl UnixListener {
                 target_os = "redox",
                 target_os = "espidf",
                 target_os = "horizon",
-                target_os = "linux",
+                any(target_os = "linux", target_os = "runixos"),
                 target_os = "freebsd",
                 target_os = "openbsd",
                 target_vendor = "apple",
@@ -137,9 +137,9 @@ impl UnixListener {
     pub fn bind_addr(socket_addr: &SocketAddr) -> io::Result<UnixListener> {
         unsafe {
             let inner = Socket::new(libc::AF_UNIX, libc::SOCK_STREAM)?;
-            #[cfg(target_os = "linux")]
+            #[cfg(any(target_os = "linux", target_os = "runixos"))]
             const backlog: core::ffi::c_int = -1;
-            #[cfg(not(target_os = "linux"))]
+            #[cfg(not(any(target_os = "linux", target_os = "runixos")))]
             const backlog: core::ffi::c_int = 128;
             cvt(libc::bind(
                 inner.as_raw_fd(),

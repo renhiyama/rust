@@ -62,7 +62,7 @@ pub fn args() -> Args {
 }
 
 #[cfg(any(
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "android",
     target_os = "freebsd",
     target_os = "dragonfly",
@@ -115,7 +115,7 @@ mod imp {
 
     /// glibc passes argc, argv, and envp to functions in .init_array, as a non-standard extension.
     /// This allows `std::env::args` to work even in a `cdylib`, as it does on macOS and Windows.
-    #[cfg(all(target_os = "linux", target_env = "gnu"))]
+    #[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
     #[used]
     #[unsafe(link_section = ".init_array.00099")]
     static ARGV_INIT_ARRAY: extern "C" fn(

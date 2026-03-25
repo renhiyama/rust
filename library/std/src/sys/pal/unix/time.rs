@@ -102,7 +102,7 @@ impl Timespec {
 
         // Try to use 64-bit time in preparation for Y2038.
         #[cfg(all(
-            target_os = "linux",
+            any(target_os = "linux", target_os = "runixos"),
             target_env = "gnu",
             target_pointer_width = "32",
             not(target_arch = "riscv32")
@@ -214,7 +214,7 @@ impl Timespec {
     }
 
     #[cfg(all(
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_env = "gnu",
         target_pointer_width = "32",
         not(target_arch = "riscv32")
@@ -225,7 +225,7 @@ impl Timespec {
 }
 
 #[cfg(all(
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_env = "gnu",
     target_pointer_width = "32",
     not(target_arch = "riscv32")
@@ -241,7 +241,7 @@ pub(crate) struct __timespec64 {
 }
 
 #[cfg(all(
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_env = "gnu",
     target_pointer_width = "32",
     not(target_arch = "riscv32")
@@ -290,7 +290,7 @@ impl Instant {
     }
 
     #[cfg_attr(
-        not(target_os = "linux"),
+        not(any(target_os = "linux", target_os = "runixos")),
         allow(unused, reason = "needed by the `sleep_until` on some unix platforms")
     )]
     pub(crate) fn into_timespec(self) -> Timespec {

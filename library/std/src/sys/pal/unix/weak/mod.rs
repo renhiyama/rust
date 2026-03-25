@@ -33,20 +33,20 @@ cfg_select! {
         // There are a variety of `#[cfg]`s controlling which targets are involved in
         // each instance of `weak!`. Rather than trying to unify all of
         // that, we'll just allow that some unix targets don't use this macro at all.
-        #[cfg_attr(not(target_os = "linux"), allow(unused_macros, dead_code))]
+        #[cfg_attr(not(any(target_os = "linux", target_os = "runixos")), allow(unused_macros, dead_code))]
         mod weak_linkage;
-        #[cfg_attr(not(target_os = "linux"), allow(unused_imports))]
+        #[cfg_attr(not(any(target_os = "linux", target_os = "runixos")), allow(unused_imports))]
         pub(crate) use weak_linkage::weak;
     }
 }
 
 // GNU/Linux needs the `dlsym` variant to avoid linking to private glibc symbols.
-#[cfg(all(target_os = "linux", target_env = "gnu"))]
+#[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
 mod dlsym;
-#[cfg(all(target_os = "linux", target_env = "gnu"))]
+#[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
 pub(crate) use dlsym::weak as dlsym;
 
-#[cfg(any(target_os = "android", target_os = "linux"))]
+#[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos")))]
 mod syscall;
-#[cfg(any(target_os = "android", target_os = "linux"))]
+#[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos")))]
 pub(crate) use syscall::syscall;

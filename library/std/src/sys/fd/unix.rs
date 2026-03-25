@@ -4,7 +4,7 @@
 mod tests;
 
 #[cfg(not(any(
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "l4re",
     target_os = "android",
     target_os = "hurd",
@@ -12,7 +12,7 @@ mod tests;
 use libc::off_t as off64_t;
 #[cfg(any(
     target_os = "android",
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "l4re",
     target_os = "hurd",
 ))]
@@ -20,7 +20,7 @@ use libc::off64_t;
 
 cfg_select! {
     any(
-        all(target_os = "linux", not(target_env = "musl")),
+        all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")),
         target_os = "android",
         target_os = "hurd",
     ) => {
@@ -75,7 +75,7 @@ const fn max_iov() -> usize {
 #[cfg(any(
     target_os = "android",
     target_os = "emscripten",
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "nto",
 ))]
 const fn max_iov() -> usize {
@@ -88,7 +88,7 @@ const fn max_iov() -> usize {
     target_os = "emscripten",
     target_os = "espidf",
     target_os = "freebsd",
-    target_os = "linux",
+    any(target_os = "linux", target_os = "runixos"),
     target_os = "netbsd",
     target_os = "nuttx",
     target_os = "nto",
@@ -216,7 +216,7 @@ impl FileDesc {
         target_os = "fuchsia",
         target_os = "hurd",
         target_os = "illumos",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "netbsd",
         target_os = "openbsd", // OpenBSD 2.7
     ))]
@@ -241,7 +241,7 @@ impl FileDesc {
         target_os = "fuchsia",
         target_os = "hurd",
         target_os = "illumos",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "netbsd",
         target_os = "openbsd",
         target_vendor = "apple",
@@ -391,13 +391,13 @@ impl FileDesc {
 
     pub fn write_at(&self, buf: &[u8], offset: u64) -> io::Result<usize> {
         #[cfg(not(any(
-            all(target_os = "linux", not(target_env = "musl")),
+            all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")),
             target_os = "android",
             target_os = "hurd"
         )))]
         use libc::pwrite as pwrite64;
         #[cfg(any(
-            all(target_os = "linux", not(target_env = "musl")),
+            all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")),
             target_os = "android",
             target_os = "hurd"
         ))]
@@ -422,7 +422,7 @@ impl FileDesc {
         target_os = "fuchsia",
         target_os = "hurd",
         target_os = "illumos",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "netbsd",
         target_os = "openbsd", // OpenBSD 2.7
     ))]
@@ -447,7 +447,7 @@ impl FileDesc {
         target_os = "fuchsia",
         target_os = "hurd",
         target_os = "illumos",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "netbsd",
         target_os = "openbsd",
         target_vendor = "apple",
@@ -554,7 +554,7 @@ impl FileDesc {
         target_os = "emscripten",
         target_os = "fuchsia",
         target_os = "l4re",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "cygwin",
         target_os = "haiku",
         target_os = "redox",
@@ -577,7 +577,7 @@ impl FileDesc {
         target_os = "emscripten",
         target_os = "fuchsia",
         target_os = "l4re",
-        target_os = "linux",
+        any(target_os = "linux", target_os = "runixos"),
         target_os = "cygwin",
         target_os = "haiku",
         target_os = "redox",
@@ -601,7 +601,7 @@ impl FileDesc {
         Ok(())
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "runixos"))]
     pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
         unsafe {
             let v = nonblocking as libc::c_int;
@@ -610,7 +610,7 @@ impl FileDesc {
         }
     }
 
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "runixos")))]
     pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
         unsafe {
             let previous = cvt(libc::fcntl(self.as_raw_fd(), libc::F_GETFL))?;

@@ -23,7 +23,7 @@ cfg_select! {
 
 // This module is shared by all platforms, but nearly all platforms except for
 // the "normal" UNIX ones leave some of this code unused.
-#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
+#[cfg_attr(not(any(target_os = "linux", target_os = "runixos")), allow(dead_code))]
 mod env;
 
 pub use env::CommandEnvs;

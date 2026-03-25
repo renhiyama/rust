@@ -656,7 +656,7 @@ impl Error {
     /// On Linux:
     ///
     /// ```
-    /// # if cfg!(target_os = "linux") {
+    /// # if cfg!(any(target_os = "linux", target_os = "runixos")) {
     /// use std::io;
     ///
     /// let error = io::Error::from_raw_os_error(22);

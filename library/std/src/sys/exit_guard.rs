@@ -1,5 +1,5 @@
 cfg_select! {
-    target_os = "linux" => {
+    any(target_os = "linux", target_os = "runixos") => {
         /// Mitigation for <https://github.com/rust-lang/rust/issues/126600>
         ///
         /// On glibc, `libc::exit` has been observed to not always be thread-safe.

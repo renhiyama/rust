@@ -27,7 +27,7 @@ pub trait UnixSocketExt: Sealed {
     ///
     /// ```no_run
     /// #![feature(unix_socket_ancillary_data)]
-    /// #[cfg(target_os = "linux")]
+    /// #[cfg(any(target_os = "linux", target_os = "runixos"))]
     /// use std::os::linux::net::UnixSocketExt;
     /// #[cfg(target_os = "android")]
     /// use std::os::android::net::UnixSocketExt;

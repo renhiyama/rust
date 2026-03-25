@@ -37,7 +37,7 @@ cfg_select! {
 
 #[cfg_attr(
     // Make sure that this is used on some platforms at least.
-    not(any(target_os = "linux", target_os = "windows")),
+    not(any(any(target_os = "linux", target_os = "runixos"), target_os = "windows")),
     allow(dead_code)
 )]
 fn each_addr<A: crate::net::ToSocketAddrs, F, T>(addr: A, mut f: F) -> crate::io::Result<T>
