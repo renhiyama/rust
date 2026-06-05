@@ -191,17 +191,6 @@ pub mod os {
     pub const EXE_EXTENSION: &str = "";
 }
 
-#[cfg(target_os = "runixos")]
-pub mod os {
-    pub const FAMILY: &str = "unix";
-    pub const OS: &str = "runixos";
-    pub const DLL_PREFIX: &str = "lib";
-    pub const DLL_SUFFIX: &str = ".rdl";
-    pub const DLL_EXTENSION: &str = "rdl";
-    pub const EXE_SUFFIX: &str = "";
-    pub const EXE_EXTENSION: &str = "";
-}
-
 #[cfg(target_os = "macos")]
 pub mod os {
     pub const FAMILY: &str = "unix";
@@ -378,7 +367,7 @@ pub mod os {
     pub const EXE_EXTENSION: &str = "";
 }
 
-#[cfg(all(target_family = "wasm", not(any(target_os = "emscripten", any(target_os = "linux", target_os = "runixos")))))]
+#[cfg(all(target_family = "wasm", not(any(target_os = "emscripten", target_os = "linux"))))]
 pub mod os {
     pub const FAMILY: &str = "";
     pub const OS: &str = "";

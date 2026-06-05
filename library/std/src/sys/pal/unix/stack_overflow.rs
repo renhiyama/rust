@@ -28,7 +28,7 @@ impl Drop for Handler {
 #[cfg(all(
     not(miri),
     any(
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "freebsd",
         target_os = "hurd",
         target_os = "macos",
@@ -46,7 +46,7 @@ mod thread_info;
 #[cfg(all(
     not(miri),
     any(
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "freebsd",
         target_os = "hurd",
         target_os = "macos",
@@ -61,9 +61,9 @@ mod imp {
         MAP_ANON, MAP_FAILED, MAP_FIXED, MAP_PRIVATE, PROT_NONE, PROT_READ, PROT_WRITE, SA_ONSTACK,
         SA_SIGINFO, SIG_DFL, SIGBUS, SIGSEGV, SS_DISABLE, sigaction, sigaltstack, sighandler_t,
     };
-    #[cfg(not(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu")))]
+    #[cfg(not(all(target_os = "linux", target_env = "gnu")))]
     use libc::{mmap as mmap64, mprotect, munmap};
-    #[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
+    #[cfg(all(target_os = "linux", target_env = "gnu"))]
     use libc::{mmap64, mprotect, munmap};
 
     use super::Handler;
@@ -200,14 +200,14 @@ mod imp {
         #[cfg(any(
             target_os = "openbsd",
             target_os = "netbsd",
-            any(target_os = "linux", target_os = "runixos"),
+            target_os = "linux",
             target_os = "dragonfly",
         ))]
         let flags = MAP_PRIVATE | MAP_ANON | libc::MAP_STACK;
         #[cfg(not(any(
             target_os = "openbsd",
             target_os = "netbsd",
-            any(target_os = "linux", target_os = "runixos"),
+            target_os = "linux",
             target_os = "dragonfly",
         )))]
         let flags = MAP_PRIVATE | MAP_ANON;
@@ -296,7 +296,7 @@ mod imp {
     }
 
     /// Modern kernels on modern hardware can have dynamic signal stack sizes.
-    #[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "android"))]
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     fn sigstack_size() -> usize {
         let dynamic_sigstksz = unsafe { libc::getauxval(libc::AT_MINSIGSTKSZ) };
         // If getauxval couldn't find the entry, it returns 0,
@@ -306,7 +306,7 @@ mod imp {
     }
 
     /// Not all OS support hardware where this is needed.
-    #[cfg(not(any(any(target_os = "linux", target_os = "runixos"), target_os = "android")))]
+    #[cfg(not(any(target_os = "linux", target_os = "android")))]
     fn sigstack_size() -> usize {
         libc::SIGSTKSZ
     }
@@ -346,7 +346,7 @@ mod imp {
         target_os = "freebsd",
         target_os = "netbsd",
         target_os = "hurd",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "l4re"
     ))]
     unsafe fn get_stack_start() -> Option<*mut libc::c_void> {
@@ -400,9 +400,9 @@ mod imp {
 
         unsafe {
             // this way someone on any unix-y OS can check that all these compile
-            if cfg!(all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl"))) {
+            if cfg!(all(target_os = "linux", not(target_env = "musl"))) {
                 install_main_guard_linux(page_size)
-            } else if cfg!(all(any(target_os = "linux", target_os = "runixos"), target_env = "musl")) {
+            } else if cfg!(all(target_os = "linux", target_env = "musl")) {
                 install_main_guard_linux_musl(page_size)
             } else if cfg!(target_os = "freebsd") {
                 #[cfg(not(target_os = "freebsd"))]
@@ -544,7 +544,7 @@ mod imp {
         target_os = "android",
         target_os = "freebsd",
         target_os = "hurd",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "l4re"
     ))]
@@ -566,7 +566,7 @@ mod imp {
             let mut guardsize = 0;
             assert_eq!(libc::pthread_attr_getguardsize(attr.as_ptr(), &mut guardsize), 0);
             if guardsize == 0 {
-                if cfg!(all(any(target_os = "linux", target_os = "runixos"), target_env = "musl")) {
+                if cfg!(all(target_os = "linux", target_env = "musl")) {
                     // musl versions before 1.1.19 always reported guard
                     // size obtained from pthread_attr_get_np as zero.
                     // Use page size as a fallback.
@@ -582,9 +582,9 @@ mod imp {
             let stackaddr = stackptr.addr();
             ret = if cfg!(any(target_os = "freebsd", target_os = "netbsd", target_os = "hurd")) {
                 Some(stackaddr - guardsize..stackaddr)
-            } else if cfg!(all(any(target_os = "linux", target_os = "runixos"), target_env = "musl")) {
+            } else if cfg!(all(target_os = "linux", target_env = "musl")) {
                 Some(stackaddr - guardsize..stackaddr)
-            } else if cfg!(all(any(target_os = "linux", target_os = "runixos"), any(target_env = "gnu", target_env = "uclibc")))
+            } else if cfg!(all(target_os = "linux", any(target_env = "gnu", target_env = "uclibc")))
             {
                 // glibc used to include the guard area within the stack, as noted in the BUGS
                 // section of `man pthread_attr_getguardsize`. This has been corrected starting
@@ -615,7 +615,7 @@ mod imp {
 #[cfg(any(
     miri,
     not(any(
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "freebsd",
         target_os = "hurd",
         target_os = "macos",

@@ -4,9 +4,9 @@ use crate::spec::{
 
 pub(crate) fn target() -> Target {
     Target {
-        llvm_target: "aarch64-rovelstars-runixos".into(),
+        llvm_target: "aarch64-rovelstars-linux-runixos".into(),
         metadata: TargetMetadata {
-            description: Some("ARM64 Rovel Stars RunixOS".into()),
+            description: Some("ARM64 RunixOS (RovelStars, Linux environment)".into()),
             tier: Some(2),
             host_tools: Some(true),
             std: Some(true),
@@ -16,9 +16,8 @@ pub(crate) fn target() -> Target {
         arch: "aarch64".into(),
         options: TargetOptions {
             features: "+v8a,+outline-atomics".into(),
-            // the AAPCS64 expects use of non-leaf frame pointers per
-            // https://github.com/ARM-software/abi-aa/blob/4492d1570eb70c8fd146623e0db65b2d241f12e7/aapcs64/aapcs64.rst#the-frame-pointer
-            // and we tend to encounter interesting bugs in AArch64 unwinding code if we do not
+            // The AAPCS64 expects non-leaf frame pointers (see the ARM ABI docs),
+            // and AArch64 unwinding hits interesting bugs without them.
             frame_pointer: FramePointer::NonLeaf,
             mcount: "\u{1}_mcount".into(),
             max_atomic_width: Some(128),
@@ -32,7 +31,7 @@ pub(crate) fn target() -> Target {
                 | SanitizerSet::THREAD
                 | SanitizerSet::HWADDRESS,
             supports_xray: true,
-            ..base::rovelstars::opts()
+            ..base::linux_runixos::opts()
         },
     }
 }

@@ -1,6 +1,6 @@
 /// Hook into .init_array to enable LSE atomic operations at startup, if
 /// supported.
-#[cfg(all(target_arch = "aarch64", any(target_os = "linux", target_os = "runixos"), not(feature = "compiler-builtins-c")))]
+#[cfg(all(target_arch = "aarch64", target_os = "linux", not(feature = "compiler-builtins-c")))]
 #[used]
 #[unsafe(link_section = ".init_array.90")]
 static RUST_LSE_INIT: extern "C" fn() = {

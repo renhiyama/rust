@@ -99,7 +99,7 @@ pub struct Command {
     stdin: Option<Stdio>,
     stdout: Option<Stdio>,
     stderr: Option<Stdio>,
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     create_pidfd: bool,
     pgroup: Option<pid_t>,
     setsid: bool,
@@ -179,7 +179,7 @@ impl Command {
             stdin: None,
             stdout: None,
             stderr: None,
-            #[cfg(any(target_os = "linux", target_os = "runixos"))]
+            #[cfg(target_os = "linux")]
             create_pidfd: false,
             pgroup: None,
             setsid: false,
@@ -222,18 +222,18 @@ impl Command {
         self.setsid = setsid;
     }
 
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     pub fn create_pidfd(&mut self, val: bool) {
         self.create_pidfd = val;
     }
 
-    #[cfg(not(any(target_os = "linux", target_os = "runixos")))]
+    #[cfg(not(target_os = "linux"))]
     #[allow(dead_code)]
     pub fn get_create_pidfd(&self) -> bool {
         false
     }
 
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     pub fn get_create_pidfd(&self) -> bool {
         self.create_pidfd
     }
@@ -525,7 +525,7 @@ impl fmt::Debug for Command {
                 debug_command.field("pgroup", &self.pgroup);
             }
 
-            #[cfg(any(target_os = "linux", target_os = "runixos"))]
+            #[cfg(target_os = "linux")]
             {
                 debug_command.field("create_pidfd", &self.create_pidfd);
             }

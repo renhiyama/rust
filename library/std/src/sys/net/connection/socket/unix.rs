@@ -71,7 +71,7 @@ impl Socket {
                 target_os = "freebsd",
                 target_os = "illumos",
                 target_os = "hurd",
-                any(target_os = "linux", target_os = "runixos"),
+                target_os = "linux",
                 target_os = "netbsd",
                 target_os = "openbsd",
                 target_os = "cygwin",
@@ -118,7 +118,7 @@ impl Socket {
                     target_os = "dragonfly",
                     target_os = "freebsd",
                     target_os = "illumos",
-                    any(target_os = "linux", target_os = "runixos"),
+                    target_os = "linux",
                     target_os = "hurd",
                     target_os = "netbsd",
                     target_os = "openbsd",
@@ -249,7 +249,7 @@ impl Socket {
                 target_os = "dragonfly",
                 target_os = "freebsd",
                 target_os = "illumos",
-                any(target_os = "linux", target_os = "runixos"),
+                target_os = "linux",
                 target_os = "hurd",
                 target_os = "netbsd",
                 target_os = "openbsd",
@@ -351,7 +351,7 @@ impl Socket {
         self.recv_from_with_flags(buf, 0)
     }
 
-    #[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
     pub fn recv_msg(&self, msg: &mut libc::msghdr) -> io::Result<usize> {
         let n = cvt(unsafe { libc::recvmsg(self.as_raw_fd(), msg, libc::MSG_CMSG_CLOEXEC) })?;
         Ok(n as usize)
@@ -374,7 +374,7 @@ impl Socket {
         self.0.is_write_vectored()
     }
 
-    #[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
     pub fn send_msg(&self, msg: &mut libc::msghdr) -> io::Result<usize> {
         let n = cvt(unsafe { libc::sendmsg(self.as_raw_fd(), msg, 0) })?;
         Ok(n as usize)
@@ -462,25 +462,25 @@ impl Socket {
         Ok(raw != 0)
     }
 
-    #[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
     pub fn set_quickack(&self, quickack: bool) -> io::Result<()> {
         unsafe { setsockopt(self, libc::IPPROTO_TCP, libc::TCP_QUICKACK, quickack as c_int) }
     }
 
-    #[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
     pub fn quickack(&self) -> io::Result<bool> {
         let raw: c_int = unsafe { getsockopt(self, libc::IPPROTO_TCP, libc::TCP_QUICKACK)? };
         Ok(raw != 0)
     }
 
     // bionic libc makes no use of this flag
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     pub fn set_deferaccept(&self, accept: Duration) -> io::Result<()> {
         let val = cmp::min(accept.as_secs(), c_int::MAX as u64) as c_int;
         unsafe { setsockopt(self, libc::IPPROTO_TCP, libc::TCP_DEFER_ACCEPT, val) }
     }
 
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     pub fn deferaccept(&self) -> io::Result<Duration> {
         let raw: c_int = unsafe { getsockopt(self, libc::IPPROTO_TCP, libc::TCP_DEFER_ACCEPT)? };
         Ok(Duration::from_secs(raw as _))
@@ -534,12 +534,12 @@ impl Socket {
         Ok(raw != 0)
     }
 
-    #[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
     pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
         unsafe { setsockopt(self, libc::SOL_SOCKET, libc::SO_PASSCRED, passcred as libc::c_int) }
     }
 
-    #[cfg(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "cygwin"))]
     pub fn passcred(&self) -> io::Result<bool> {
         let passcred: libc::c_int =
             unsafe { getsockopt(self, libc::SOL_SOCKET, libc::SO_PASSCRED)? };
@@ -596,9 +596,9 @@ impl Socket {
         self.0.set_nonblocking(nonblocking)
     }
 
-    #[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "freebsd", target_os = "openbsd"))]
+    #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd"))]
     pub fn set_mark(&self, mark: u32) -> io::Result<()> {
-        #[cfg(any(target_os = "linux", target_os = "runixos"))]
+        #[cfg(target_os = "linux")]
         let option = libc::SO_MARK;
         #[cfg(target_os = "freebsd")]
         let option = libc::SO_USER_COOKIE;
@@ -678,7 +678,7 @@ impl FromRawFd for Socket {
 // res_init unconditionally, we call it only when we detect we're linking
 // against glibc version < 2.26. (That is, when we both know its needed and
 // believe it's thread-safe).
-#[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
+#[cfg(all(target_os = "linux", target_env = "gnu"))]
 fn on_resolver_failure() {
     use crate::sys;
 
@@ -690,5 +690,5 @@ fn on_resolver_failure() {
     }
 }
 
-#[cfg(not(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu")))]
+#[cfg(not(all(target_os = "linux", target_env = "gnu")))]
 fn on_resolver_failure() {}

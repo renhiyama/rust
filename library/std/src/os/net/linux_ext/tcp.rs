@@ -4,7 +4,7 @@
 
 use crate::sealed::Sealed;
 use crate::sys_common::AsInner;
-#[cfg(any(target_os = "linux", target_os = "runixos"))]
+#[cfg(target_os = "linux")]
 use crate::time::Duration;
 use crate::{io, net};
 
@@ -26,7 +26,7 @@ pub trait TcpStreamExt: Sealed {
     ///
     /// ```no_run
     /// use std::net::TcpStream;
-    /// #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    /// #[cfg(target_os = "linux")]
     /// use std::os::linux::net::TcpStreamExt;
     /// #[cfg(target_os = "android")]
     /// use std::os::android::net::TcpStreamExt;
@@ -46,7 +46,7 @@ pub trait TcpStreamExt: Sealed {
     ///
     /// ```no_run
     /// use std::net::TcpStream;
-    /// #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    /// #[cfg(target_os = "linux")]
     /// use std::os::linux::net::TcpStreamExt;
     /// #[cfg(target_os = "android")]
     /// use std::os::android::net::TcpStreamExt;
@@ -84,7 +84,7 @@ pub trait TcpStreamExt: Sealed {
     /// stream.set_deferaccept(Duration::from_secs(1u64)).expect("set_deferaccept call failed");
     /// ```
     #[unstable(feature = "tcp_deferaccept", issue = "119639")]
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     fn set_deferaccept(&self, accept: Duration) -> io::Result<()>;
 
     /// Gets the accept delay value of the `TCP_DEFER_ACCEPT` option.
@@ -105,7 +105,7 @@ pub trait TcpStreamExt: Sealed {
     /// assert_eq!(stream.deferaccept().unwrap(), Duration::from_secs(1u64));
     /// ```
     #[unstable(feature = "tcp_deferaccept", issue = "119639")]
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     fn deferaccept(&self) -> io::Result<Duration>;
 }
 
@@ -122,12 +122,12 @@ impl TcpStreamExt for net::TcpStream {
         self.as_inner().as_inner().quickack()
     }
 
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     fn set_deferaccept(&self, accept: Duration) -> io::Result<()> {
         self.as_inner().as_inner().set_deferaccept(accept)
     }
 
-    #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    #[cfg(target_os = "linux")]
     fn deferaccept(&self) -> io::Result<Duration> {
         self.as_inner().as_inner().deferaccept()
     }

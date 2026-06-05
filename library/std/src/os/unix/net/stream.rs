@@ -1,6 +1,6 @@
 cfg_select! {
     any(
-        any(target_os = "linux", target_os = "runixos"), target_os = "android",
+        target_os = "linux", target_os = "android",
         target_os = "hurd",
         target_os = "dragonfly", target_os = "freebsd",
         target_os = "openbsd", target_os = "netbsd",
@@ -16,11 +16,11 @@ cfg_select! {
 }
 
 use super::{SocketAddr, sockaddr_un};
-#[cfg(any(doc, target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+#[cfg(any(doc, target_os = "android", target_os = "linux", target_os = "cygwin"))]
 use super::{SocketAncillary, recv_vectored_with_ancillary_from, send_vectored_with_ancillary_to};
 #[cfg(any(
     target_os = "android",
-    any(target_os = "linux", target_os = "runixos"),
+    target_os = "linux",
     target_os = "dragonfly",
     target_os = "freebsd",
     target_os = "netbsd",
@@ -248,7 +248,7 @@ impl UnixStream {
     #[unstable(feature = "peer_credentials_unix_socket", issue = "42839", reason = "unstable")]
     #[cfg(any(
         target_os = "android",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "dragonfly",
         target_os = "freebsd",
         target_os = "netbsd",
@@ -408,11 +408,11 @@ impl UnixStream {
     /// Set the id of the socket for network filtering purpose
     ///
     #[cfg_attr(
-        any(any(target_os = "linux", target_os = "runixos"), target_os = "freebsd", target_os = "openbsd"),
+        any(target_os = "linux", target_os = "freebsd", target_os = "openbsd"),
         doc = "```no_run"
     )]
     #[cfg_attr(
-        not(any(any(target_os = "linux", target_os = "runixos"), target_os = "freebsd", target_os = "openbsd")),
+        not(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd")),
         doc = "```ignore"
     )]
     /// #![feature(unix_set_mark)]
@@ -424,7 +424,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-    #[cfg(any(doc, any(target_os = "linux", target_os = "runixos"), target_os = "freebsd", target_os = "openbsd",))]
+    #[cfg(any(doc, target_os = "linux", target_os = "freebsd", target_os = "openbsd",))]
     #[unstable(feature = "unix_set_mark", issue = "96467")]
     pub fn set_mark(&self, mark: u32) -> io::Result<()> {
         self.0.set_mark(mark)
@@ -509,11 +509,11 @@ impl UnixStream {
     /// # Examples
     ///
     #[cfg_attr(
-        any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"),
+        any(target_os = "android", target_os = "linux", target_os = "cygwin"),
         doc = "```no_run"
     )]
     #[cfg_attr(
-        not(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin")),
+        not(any(target_os = "android", target_os = "linux", target_os = "cygwin")),
         doc = "```ignore"
     )]
     /// #![feature(unix_socket_ancillary_data)]
@@ -545,7 +545,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-    #[cfg(any(doc, target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+    #[cfg(any(doc, target_os = "android", target_os = "linux", target_os = "cygwin"))]
     #[unstable(feature = "unix_socket_ancillary_data", issue = "76915")]
     pub fn recv_vectored_with_ancillary(
         &self,
@@ -564,11 +564,11 @@ impl UnixStream {
     /// # Examples
     ///
     #[cfg_attr(
-        any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"),
+        any(target_os = "android", target_os = "linux", target_os = "cygwin"),
         doc = "```no_run"
     )]
     #[cfg_attr(
-        not(any(target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin")),
+        not(any(target_os = "android", target_os = "linux", target_os = "cygwin")),
         doc = "```ignore"
     )]
     /// #![feature(unix_socket_ancillary_data)]
@@ -594,7 +594,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-    #[cfg(any(doc, target_os = "android", any(target_os = "linux", target_os = "runixos"), target_os = "cygwin"))]
+    #[cfg(any(doc, target_os = "android", target_os = "linux", target_os = "cygwin"))]
     #[unstable(feature = "unix_socket_ancillary_data", issue = "76915")]
     pub fn send_vectored_with_ancillary(
         &self,

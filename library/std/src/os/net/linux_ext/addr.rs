@@ -23,7 +23,7 @@ pub trait SocketAddrExt: Sealed {
     ///
     /// ```no_run
     /// use std::os::unix::net::{UnixListener, SocketAddr};
-    /// #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    /// #[cfg(target_os = "linux")]
     /// use std::os::linux::net::SocketAddrExt;
     /// #[cfg(target_os = "android")]
     /// use std::os::android::net::SocketAddrExt;
@@ -51,7 +51,7 @@ pub trait SocketAddrExt: Sealed {
     ///
     /// ```no_run
     /// use std::os::unix::net::{UnixListener, SocketAddr};
-    /// #[cfg(any(target_os = "linux", target_os = "runixos"))]
+    /// #[cfg(target_os = "linux")]
     /// use std::os::linux::net::SocketAddrExt;
     /// #[cfg(target_os = "android")]
     /// use std::os::android::net::SocketAddrExt;

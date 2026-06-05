@@ -58,7 +58,7 @@ cfg_select! {
 pub(crate) mod destructors {
     cfg_select! {
         any(
-            any(target_os = "linux", target_os = "runixos"),
+            target_os = "linux",
             target_os = "android",
             target_os = "fuchsia",
             target_os = "redox",

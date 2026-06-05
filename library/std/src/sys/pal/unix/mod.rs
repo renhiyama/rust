@@ -5,9 +5,9 @@ use crate::io::ErrorKind;
 #[cfg(target_os = "fuchsia")]
 pub mod fuchsia;
 pub mod futex;
-#[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "android"))]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 pub mod kernel_copy;
-#[cfg(any(target_os = "linux", target_os = "runixos"))]
+#[cfg(target_os = "linux")]
 pub mod linux;
 pub mod os;
 pub mod pipe;
@@ -59,9 +59,9 @@ pub unsafe fn init(argc: isize, argv: *const *const u8, sigpipe: u8) {
         let mut opened_devnull = -1;
         #[allow(dead_code, unused_variables, unused_mut)]
         let mut open_devnull = || {
-            #[cfg(not(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu")))]
+            #[cfg(not(all(target_os = "linux", target_env = "gnu")))]
             use libc::open;
-            #[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
+            #[cfg(all(target_os = "linux", target_env = "gnu"))]
             use libc::open64 as open;
 
             if opened_devnull != -1 {
@@ -418,7 +418,7 @@ cfg_select! {
         #[link(name = "fdio")]
         unsafe extern "C" {}
     }
-    all(any(target_os = "linux", target_os = "runixos"), target_env = "uclibc") => {
+    all(target_os = "linux", target_env = "uclibc") => {
         #[link(name = "dl")]
         unsafe extern "C" {}
     }

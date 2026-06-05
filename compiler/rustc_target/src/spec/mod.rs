@@ -1790,8 +1790,8 @@ supported_targets! {
 
     ("x86_64-pc-cygwin", x86_64_pc_cygwin),
     
-    ("x86_64-rovelstars-runixos", x86_64_rovelstars_runixos),
-    ("aarch64-rovelstars-runixos", aarch64_rovelstars_runixos),
+    ("x86_64-rovelstars-linux-runixos", x86_64_rovelstars_linux_runixos),
+    ("aarch64-rovelstars-linux-runixos", aarch64_rovelstars_linux_runixos),
 }
 
 /// Cow-Vec-Str: Cow<'static, [Cow<'static, str>]>

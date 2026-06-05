@@ -410,7 +410,7 @@ impl Instant {
 
     // Used by platform specific `sleep_until` implementations such as the one used on Linux.
     #[cfg_attr(
-        not(any(target_os = "linux", target_os = "runixos")),
+        not(target_os = "linux"),
         allow(unused, reason = "not every platform has a specific `sleep_until`")
     )]
     pub(crate) fn into_inner(self) -> time::Instant {

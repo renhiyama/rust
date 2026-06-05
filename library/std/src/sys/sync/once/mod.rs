@@ -10,7 +10,7 @@
 cfg_select! {
     any(
         all(target_os = "windows", not(target_vendor="win7")),
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "android",
         all(target_arch = "wasm32", target_feature = "atomics"),
         target_os = "freebsd",

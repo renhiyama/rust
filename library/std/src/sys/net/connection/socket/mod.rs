@@ -64,7 +64,7 @@ cfg_select! {
 
 cfg_select! {
     any(
-        any(target_os = "linux", target_os = "runixos"), target_os = "android",
+        target_os = "linux", target_os = "android",
         target_os = "hurd",
         target_os = "dragonfly", target_os = "freebsd",
         target_os = "openbsd", target_os = "netbsd",

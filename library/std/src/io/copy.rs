@@ -64,7 +64,7 @@ where
     W: Write,
 {
     cfg_select! {
-        any(any(target_os = "linux", target_os = "runixos"), target_os = "android") => {
+        any(target_os = "linux", target_os = "android") => {
             crate::sys::kernel_copy::copy_spec(reader, writer)
         }
         _ => {

@@ -63,7 +63,7 @@ cfg_select! {
         #[cfg(any(
             target_os = "freebsd",
             target_os = "netbsd",
-            any(target_os = "linux", target_os = "runixos"),
+            target_os = "linux",
             target_os = "android",
             target_os = "solaris",
             target_os = "illumos",
@@ -142,7 +142,7 @@ cfg_select! {
 #[cfg(not(any(
     target_os = "freebsd",
     target_os = "netbsd",
-    any(target_os = "linux", target_os = "runixos"),
+    target_os = "linux",
     target_os = "android",
     target_os = "solaris",
     target_os = "illumos",

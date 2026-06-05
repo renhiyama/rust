@@ -13,7 +13,7 @@ cfg_select! {
         #[cfg(not(target_os = "fuchsia"))]
         pub use unix::chroot;
         pub(crate) use unix::debug_assert_fd_is_open;
-        #[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "android"))]
+        #[cfg(any(target_os = "linux", target_os = "android"))]
         pub(crate) use unix::CachedFileMetadata;
         use crate::sys::common::small_c_string::run_path_with_cstr as with_native_path;
     }

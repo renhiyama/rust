@@ -6,10 +6,10 @@
 #[cfg(test)]
 mod tests;
 
-#[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
+#[cfg(all(target_os = "linux", target_env = "gnu"))]
 use libc::c_char;
 #[cfg(any(
-    all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")),
+    all(target_os = "linux", not(target_env = "musl")),
     target_os = "android",
     target_os = "fuchsia",
     target_os = "hurd",
@@ -18,7 +18,7 @@ use libc::c_char;
 use libc::dirfd;
 #[cfg(any(target_os = "fuchsia", target_os = "illumos"))]
 use libc::fstatat as fstatat64;
-#[cfg(any(all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")), target_os = "hurd"))]
+#[cfg(any(all(target_os = "linux", not(target_env = "musl")), target_os = "hurd"))]
 use libc::fstatat64;
 #[cfg(any(
     target_os = "aix",
@@ -30,7 +30,7 @@ use libc::fstatat64;
     target_os = "redox",
     target_os = "solaris",
     target_os = "vita",
-    all(any(target_os = "linux", target_os = "runixos"), target_env = "musl"),
+    all(target_os = "linux", target_env = "musl"),
 ))]
 use libc::readdir as readdir64;
 #[cfg(not(any(
@@ -41,14 +41,14 @@ use libc::readdir as readdir64;
     target_os = "hurd",
     target_os = "illumos",
     target_os = "l4re",
-    any(target_os = "linux", target_os = "runixos"),
+    target_os = "linux",
     target_os = "nto",
     target_os = "redox",
     target_os = "solaris",
     target_os = "vita",
 )))]
 use libc::readdir_r as readdir64_r;
-#[cfg(any(all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")), target_os = "hurd"))]
+#[cfg(any(all(target_os = "linux", not(target_env = "musl")), target_os = "hurd"))]
 use libc::readdir64;
 #[cfg(target_os = "l4re")]
 use libc::readdir64_r;
@@ -59,7 +59,7 @@ use libc::{
     lstat as lstat64, off64_t, open as open64, stat as stat64,
 };
 #[cfg(not(any(
-    all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")),
+    all(target_os = "linux", not(target_env = "musl")),
     target_os = "l4re",
     target_os = "android",
     target_os = "hurd",
@@ -69,7 +69,7 @@ use libc::{
     lstat as lstat64, off_t as off64_t, open as open64, stat as stat64,
 };
 #[cfg(any(
-    all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")),
+    all(target_os = "linux", not(target_env = "musl")),
     target_os = "l4re",
     target_os = "hurd"
 ))]
@@ -87,7 +87,7 @@ use crate::sys::common::small_c_string::run_path_with_cstr;
 use crate::sys::fd::FileDesc;
 pub use crate::sys::fs::common::exists;
 use crate::sys::time::SystemTime;
-#[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
+#[cfg(all(target_os = "linux", target_env = "gnu"))]
 use crate::sys::weak::syscall;
 #[cfg(target_os = "android")]
 use crate::sys::weak::weak;
@@ -104,7 +104,7 @@ pub struct File(FileDesc);
 macro_rules! cfg_has_statx {
     ({ $($then_tt:tt)* } else { $($else_tt:tt)* }) => {
         cfg_select! {
-            all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu") => {
+            all(target_os = "linux", target_env = "gnu") => {
                 $($then_tt)*
             }
             _ => {
@@ -113,7 +113,7 @@ macro_rules! cfg_has_statx {
         }
     };
     ($($block_inner:tt)*) => {
-        #[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
+        #[cfg(all(target_os = "linux", target_env = "gnu"))]
         {
             $($block_inner)*
         }
@@ -279,7 +279,7 @@ unsafe impl Sync for Dir {}
     target_os = "fuchsia",
     target_os = "hurd",
     target_os = "illumos",
-    any(target_os = "linux", target_os = "runixos"),
+    target_os = "linux",
     target_os = "nto",
     target_os = "redox",
     target_os = "solaris",
@@ -304,7 +304,7 @@ pub struct DirEntry {
     target_os = "fuchsia",
     target_os = "hurd",
     target_os = "illumos",
-    any(target_os = "linux", target_os = "runixos"),
+    target_os = "linux",
     target_os = "nto",
     target_os = "redox",
     target_os = "solaris",
@@ -329,7 +329,7 @@ struct dirent64_min {
     target_os = "fuchsia",
     target_os = "hurd",
     target_os = "illumos",
-    any(target_os = "linux", target_os = "runixos"),
+    target_os = "linux",
     target_os = "nto",
     target_os = "redox",
     target_os = "solaris",
@@ -709,7 +709,7 @@ impl Iterator for ReadDir {
         target_os = "fuchsia",
         target_os = "hurd",
         target_os = "illumos",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "nto",
         target_os = "redox",
         target_os = "solaris",
@@ -806,7 +806,7 @@ impl Iterator for ReadDir {
         target_os = "fuchsia",
         target_os = "hurd",
         target_os = "illumos",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "nto",
         target_os = "redox",
         target_os = "solaris",
@@ -902,7 +902,7 @@ impl DirEntry {
 
     #[cfg(all(
         any(
-            all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")),
+            all(target_os = "linux", not(target_env = "musl")),
             target_os = "android",
             target_os = "fuchsia",
             target_os = "hurd",
@@ -932,7 +932,7 @@ impl DirEntry {
 
     #[cfg(any(
         not(any(
-            all(any(target_os = "linux", target_os = "runixos"), not(target_env = "musl")),
+            all(target_os = "linux", not(target_env = "musl")),
             target_os = "android",
             target_os = "fuchsia",
             target_os = "hurd",
@@ -992,7 +992,7 @@ impl DirEntry {
         target_os = "hurd",
         target_os = "illumos",
         target_os = "l4re",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "nto",
         target_os = "redox",
         target_os = "rtems",
@@ -1045,7 +1045,7 @@ impl DirEntry {
     #[cfg(not(any(
         target_os = "android",
         target_os = "freebsd",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "solaris",
         target_os = "illumos",
         target_os = "fuchsia",
@@ -1061,7 +1061,7 @@ impl DirEntry {
     #[cfg(any(
         target_os = "android",
         target_os = "freebsd",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "solaris",
         target_os = "illumos",
         target_os = "fuchsia",
@@ -1257,7 +1257,7 @@ impl File {
         #[cfg(any(
             target_os = "freebsd",
             target_os = "fuchsia",
-            any(target_os = "linux", target_os = "runixos"),
+            target_os = "linux",
             target_os = "cygwin",
             target_os = "android",
             target_os = "netbsd",
@@ -1272,7 +1272,7 @@ impl File {
             target_os = "android",
             target_os = "fuchsia",
             target_os = "freebsd",
-            any(target_os = "linux", target_os = "runixos"),
+            target_os = "linux",
             target_os = "cygwin",
             target_os = "netbsd",
             target_os = "openbsd",
@@ -1288,7 +1288,7 @@ impl File {
     #[cfg(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1311,7 +1311,7 @@ impl File {
     #[cfg(not(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1325,7 +1325,7 @@ impl File {
     #[cfg(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1348,7 +1348,7 @@ impl File {
     #[cfg(not(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1362,7 +1362,7 @@ impl File {
     #[cfg(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1401,7 +1401,7 @@ impl File {
     #[cfg(not(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1418,7 +1418,7 @@ impl File {
     #[cfg(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1457,7 +1457,7 @@ impl File {
     #[cfg(not(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1474,7 +1474,7 @@ impl File {
     #[cfg(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1497,7 +1497,7 @@ impl File {
     #[cfg(not(any(
         target_os = "freebsd",
         target_os = "fuchsia",
-        any(target_os = "linux", target_os = "runixos"),
+        target_os = "linux",
         target_os = "netbsd",
         target_os = "openbsd",
         target_os = "cygwin",
@@ -1644,7 +1644,7 @@ impl File {
                 Ok(())
             }
             _ => {
-                #[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu", target_pointer_width = "32", not(target_arch = "riscv32")))]
+                #[cfg(all(target_os = "linux", target_env = "gnu", target_pointer_width = "32", not(target_arch = "riscv32")))]
                 {
                     use crate::sys::{time::__timespec64, weak::weak};
 
@@ -1812,7 +1812,7 @@ impl FromRawFd for File {
 
 impl fmt::Debug for File {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        #[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "illumos", target_os = "solaris"))]
+        #[cfg(any(target_os = "linux", target_os = "illumos", target_os = "solaris"))]
         fn get_path(fd: c_int) -> Option<PathBuf> {
             let mut p = PathBuf::from("/proc/self/fd");
             p.push(&fd.to_string());
@@ -1873,7 +1873,7 @@ impl fmt::Debug for File {
         }
 
         #[cfg(not(any(
-            any(target_os = "linux", target_os = "runixos"),
+            target_os = "linux",
             target_os = "vxworks",
             target_os = "freebsd",
             target_os = "netbsd",
@@ -2160,7 +2160,7 @@ fn set_times_impl(p: &CStr, times: FileTimes, follow_symlinks: bool) -> io::Resu
        }
        _ => {
             let flags = if follow_symlinks { 0 } else { libc::AT_SYMLINK_NOFOLLOW };
-            #[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu", target_pointer_width = "32", not(target_arch = "riscv32")))]
+            #[cfg(all(target_os = "linux", target_env = "gnu", target_pointer_width = "32", not(target_arch = "riscv32")))]
             {
                 use crate::sys::{time::__timespec64, weak::weak};
 
@@ -2278,7 +2278,7 @@ mod cfm {
         }
     }
 }
-#[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "android"))]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 pub(crate) use cfm::CachedFileMetadata;
 
 #[cfg(not(target_vendor = "apple"))]
@@ -2423,9 +2423,9 @@ mod remove_dir_impl {
     miri
 )))]
 mod remove_dir_impl {
-    #[cfg(not(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu")))]
+    #[cfg(not(all(target_os = "linux", target_env = "gnu")))]
     use libc::{fdopendir, openat, unlinkat};
-    #[cfg(all(any(target_os = "linux", target_os = "runixos"), target_env = "gnu"))]
+    #[cfg(all(target_os = "linux", target_env = "gnu"))]
     use libc::{fdopendir, openat64 as openat, unlinkat};
 
     use super::{Dir, DirEntry, InnerReadDir, ReadDir, lstat};

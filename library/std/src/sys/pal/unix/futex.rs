@@ -1,5 +1,5 @@
 #![cfg(any(
-    any(target_os = "linux", target_os = "runixos"),
+    target_os = "linux",
     target_os = "android",
     all(target_os = "emscripten", target_feature = "atomics"),
     target_os = "freebsd",
@@ -26,7 +26,7 @@ pub type SmallPrimitive = u32;
 /// Returns directly if the futex doesn't hold the expected value.
 ///
 /// Returns false on timeout, and true in all other cases.
-#[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "android", target_os = "freebsd"))]
+#[cfg(any(target_os = "linux", target_os = "android", target_os = "freebsd"))]
 pub fn futex_wait(futex: &Atomic<u32>, expected: u32, timeout: Option<Duration>) -> bool {
     use super::time::Timespec;
     use crate::ptr::null;
@@ -67,7 +67,7 @@ pub fn futex_wait(futex: &Atomic<u32>, expected: u32, timeout: Option<Duration>)
                         umtx_timeout_ptr as *mut _,
                     )
                 }
-                any(any(target_os = "linux", target_os = "runixos"), target_os = "android") => {
+                any(target_os = "linux", target_os = "android") => {
                     // Use FUTEX_WAIT_BITSET rather than FUTEX_WAIT to be able to give an
                     // absolute time rather than a relative time.
                     libc::syscall(
@@ -100,7 +100,7 @@ pub fn futex_wait(futex: &Atomic<u32>, expected: u32, timeout: Option<Duration>)
 /// or false if no thread was waiting on this futex.
 ///
 /// On some platforms, this always returns false.
-#[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "android"))]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 pub fn futex_wake(futex: &Atomic<u32>) -> bool {
     let ptr = futex as *const Atomic<u32>;
     let op = libc::FUTEX_WAKE | libc::FUTEX_PRIVATE_FLAG;
@@ -108,7 +108,7 @@ pub fn futex_wake(futex: &Atomic<u32>) -> bool {
 }
 
 /// Wakes up all threads that are waiting on `futex_wait` on this futex.
-#[cfg(any(any(target_os = "linux", target_os = "runixos"), target_os = "android"))]
+#[cfg(any(target_os = "linux", target_os = "android"))]
 pub fn futex_wake_all(futex: &Atomic<u32>) {
     let ptr = futex as *const Atomic<u32>;
     let op = libc::FUTEX_WAKE | libc::FUTEX_PRIVATE_FLAG;

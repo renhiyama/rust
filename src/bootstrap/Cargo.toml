@@ -96,5 +96,6 @@ debug = 0
 bootstrap.debug = 1
 
 [patch.crates-io]
-cc = { path = "/home/ren/coding/rovelos/cc-rs" }
-libc = { path = "/home/ren/coding/rovelos/libc" }
+# bootstrap (x.py) uses cc to detect the target compiler; upstream cc rejects the
+# unknown runixos environment in x86_64-rovelstars-linux-runixos, so use the fork.
+cc = { git = "https://github.com/renhiyama/cc-rs", branch = "runixos" }

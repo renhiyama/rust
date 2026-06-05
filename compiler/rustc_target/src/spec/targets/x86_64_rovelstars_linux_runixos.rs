@@ -3,7 +3,7 @@ use crate::spec::{
 };
 
 pub(crate) fn target() -> Target {
-    let mut base = base::rovelstars::opts();
+    let mut base = base::linux_runixos::opts();
     base.cpu = "x86-64".into();
     base.plt_by_default = false;
     base.max_atomic_width = Some(64);
@@ -21,9 +21,9 @@ pub(crate) fn target() -> Target {
     base.supports_xray = true;
 
     Target {
-        llvm_target: "x86_64-rovelstars-runixos".into(),
+        llvm_target: "x86_64-rovelstars-linux-runixos".into(),
         metadata: TargetMetadata {
-            description: Some("64-bit Rovel Stars RunixOS".into()),
+            description: Some("64-bit RunixOS (RovelStars, Linux environment)".into()),
             tier: Some(2),
             host_tools: Some(true),
             std: Some(true),

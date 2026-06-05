@@ -35,8 +35,8 @@ pub struct Finder {
 const STAGE0_MISSING_TARGETS: &[&str] = &[
     // just a dummy comment so the list doesn't get onelined
     "x86_64-unknown-motor",
-    "x86_64-rovelstars-runixos",
-    "aarch64-rovelstars-runixos"
+    "x86_64-rovelstars-linux-runixos",
+    "aarch64-rovelstars-linux-runixos"
 ];
 
 /// Minimum version threshold for libstdc++ required when using prebuilt LLVM

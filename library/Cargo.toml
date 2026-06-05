@@ -59,5 +59,7 @@ rustflags = ["-Cpanic=abort"]
 rustc-std-workspace-core = { path = 'rustc-std-workspace-core' }
 rustc-std-workspace-alloc = { path = 'rustc-std-workspace-alloc' }
 rustc-std-workspace-std = { path = 'rustc-std-workspace-std' }
-# RunixOS: use our forked libc with RunixOS target support
-libc = { path = '/home/ren/coding/rovelos/libc' }
+# RunixOS: cc must recognize the x86_64-rovelstars-linux-runixos triple (the
+# runixos environment); upstream cc does not. Used when build scripts (e.g.
+# compiler-builtins) compile C for the target.
+cc = { git = "https://github.com/renhiyama/cc-rs", branch = "runixos" }
