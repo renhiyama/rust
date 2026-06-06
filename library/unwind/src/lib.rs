@@ -116,9 +116,13 @@ unsafe extern "C" {}
 // When building with crt-static, we get `gcc_eh` from the `libc` crate, since
 // glibc needs it, and needs it listed later on the linker command line. We
 // don't want to duplicate it here.
+// RunixOS (rovelstars vendor) has a gnu environment but unwinds with LLVM's
+// libunwind rather than libgcc_s, which it does not ship. Its target spec links
+// -lunwind, so skip the libgcc_s dependency here.
 #[cfg(all(
     target_os = "linux",
     any(target_env = "gnu", target_env = "uclibc"),
+    not(target_vendor = "rovelstars"),
     not(feature = "llvm-libunwind"),
     not(feature = "system-llvm-libunwind")
 ))]
