@@ -90,7 +90,7 @@ pub fn split_debuginfo(name: impl Into<PathBuf>) -> Option<PathBuf> {
 /// Returns `true` if the file name given looks like a dynamic library.
 pub fn is_dylib(path: &Path) -> bool {
     path.extension().and_then(|ext| ext.to_str()).is_some_and(|ext| {
-        ext == "dylib" || ext == "so" || ext == "dll" || (ext == "a" && is_aix_shared_archive(path))
+        ext == "dylib" || ext == "so" || ext == "dll" || ext == "rdl" || (ext == "a" && is_aix_shared_archive(path))
     })
 }
 
