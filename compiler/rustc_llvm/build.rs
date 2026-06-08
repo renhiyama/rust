@@ -393,6 +393,10 @@ fn main() {
     } else if target.contains("netbsd") && llvm_static_stdcpp.is_some() {
         // NetBSD uses a separate library when relocation is required
         "stdc++_p"
+    } else if target.contains("runixos") {
+        // RunixOS ships libc++ (LLVM's), not libstdc++; its llvm21 is built with
+        // clang/libc++. Host stages still use the default stdc++.
+        "c++"
     } else if llvm_use_libcxx.is_some() {
         "c++"
     } else {
